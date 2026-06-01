@@ -1,7 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Button } from '@/Components/ui/button';
-import { Card, CardContent } from '@/Components/ui/card';
 import { ArrowRight, Calendar, ShieldCheck, Users } from 'lucide-react';
 
 const FEATURES = [
@@ -9,29 +8,30 @@ const FEATURES = [
         icon: Calendar,
         title: 'Agenda Kegiatan',
         desc: 'Semua informasi event dan rundown acara komunitas PensMate dalam satu tempat yang terorganisir.',
+        color: 'bg-blue-50 text-blue-600',
     },
     {
         icon: ShieldCheck,
         title: 'Member Terverifikasi',
         desc: 'Setiap anggota diverifikasi oleh admin. Komunitas yang aman, nyaman, dan terpercaya.',
+        color: 'bg-emerald-50 text-emerald-600',
     },
     {
         icon: Users,
         title: 'Jaringan Anggota',
         desc: 'Terhubung dengan sesama anggota komunitas PensMate dan tumbuh bersama.',
+        color: 'bg-violet-50 text-violet-600',
     },
 ];
 
-// Variant reusable: fade up
 const fadeUp = {
-    hidden: { opacity: 0, y: 24 },
+    hidden: { opacity: 0, y: 20 },
     show:   { opacity: 1, y: 0 },
 };
 
-// Stagger container
 const stagger = {
     hidden: {},
-    show: { transition: { staggerChildren: 0.12 } },
+    show: { transition: { staggerChildren: 0.1 } },
 };
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
@@ -39,48 +39,72 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         <div className="min-h-screen bg-background text-foreground font-sans flex flex-col">
             <Head title="Komunitas PensMate" />
 
+            {/* ── Navbar ──────────────────────────────────────────────── */}
+            <nav className="border-b border-border">
+                <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+                    <h1 className="text-base font-black tracking-tight text-primary">PensMate.</h1>
+                    <div className="flex items-center gap-2">
+                        {auth.user ? (
+                            <Button asChild size="sm" className="h-8 text-xs font-semibold">
+                                <Link href={route('dashboard')}>Dashboard</Link>
+                            </Button>
+                        ) : (
+                            <>
+                                <Button asChild variant="ghost" size="sm" className="h-8 text-xs font-medium">
+                                    <Link href={route('login')}>Masuk</Link>
+                                </Button>
+                                <Button asChild size="sm" className="h-8 text-xs font-semibold">
+                                    <Link href={route('register')}>Daftar</Link>
+                                </Button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </nav>
 
             <main className="flex-1">
-                {/* Hero */}
-                <section className="max-w-5xl mx-auto px-6 py-24 text-center">
+                {/* ── Hero ────────────────────────────────────────────── */}
+                <section className="max-w-5xl mx-auto px-6 py-24 sm:py-32">
                     <motion.div
                         variants={stagger}
                         initial="hidden"
                         animate="show"
-                        className="flex flex-col items-center gap-6"
+                        className="max-w-2xl"
                     >
-                        <motion.p
+                        <motion.div
                             variants={fadeUp}
-                            transition={{ duration: 0.5, ease: 'easeOut' }}
-                            className="text-sm font-bold text-primary uppercase tracking-widest"
+                            transition={{ duration: 0.4, ease: 'easeOut' }}
+                            className="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-full mb-6"
                         >
-                            Komunitas PensMate
-                        </motion.p>
+                            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                            Komunitas PensMate · PENS
+                        </motion.div>
 
                         <motion.h2
                             variants={fadeUp}
-                            transition={{ duration: 0.5, ease: 'easeOut' }}
-                            className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight"
+                            transition={{ duration: 0.4, ease: 'easeOut' }}
+                            className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] mb-6"
                         >
                             Satu Tempat untuk<br />
-                            <span className="text-primary">Seluruh Kegiatan Komunitas</span>
+                            Seluruh Kegiatan<br />
+                            <span className="text-primary">Komunitas.</span>
                         </motion.h2>
 
                         <motion.p
                             variants={fadeUp}
-                            transition={{ duration: 0.5, ease: 'easeOut' }}
-                            className="text-muted-foreground text-lg max-w-xl leading-relaxed"
+                            transition={{ duration: 0.4, ease: 'easeOut' }}
+                            className="text-muted-foreground text-base sm:text-lg max-w-lg leading-relaxed mb-8"
                         >
                             Platform resmi Komunitas PensMate untuk mengelola agenda, anggota, dan kegiatan bersama secara mudah dan terstruktur.
                         </motion.p>
 
                         <motion.div
                             variants={fadeUp}
-                            transition={{ duration: 0.5, ease: 'easeOut' }}
-                            className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2"
+                            transition={{ duration: 0.4, ease: 'easeOut' }}
+                            className="flex flex-col sm:flex-row items-start sm:items-center gap-3"
                         >
                             {auth.user ? (
-                                <Button asChild size="lg" className="h-12 px-8 font-bold text-base">
+                                <Button asChild size="lg" className="h-11 px-7 font-semibold">
                                     <Link href={route('dashboard')} className="inline-flex items-center gap-2">
                                         Buka Dashboard
                                         <ArrowRight className="h-4 w-4" />
@@ -88,13 +112,13 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 </Button>
                             ) : (
                                 <>
-                                    <Button asChild size="lg" className="h-12 px-8 font-bold text-base">
+                                    <Button asChild size="lg" className="h-11 px-7 font-semibold">
                                         <Link href={route('register')} className="inline-flex items-center gap-2">
                                             Bergabung Sekarang
                                             <ArrowRight className="h-4 w-4" />
                                         </Link>
                                     </Button>
-                                    <Button asChild variant="outline" size="lg" className="h-12 px-8 font-bold text-base">
+                                    <Button asChild variant="outline" size="lg" className="h-11 px-7 font-semibold">
                                         <Link href={route('login')}>Masuk</Link>
                                     </Button>
                                 </>
@@ -103,60 +127,50 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     </motion.div>
                 </section>
 
-                {/* Divider */}
+                {/* ── Divider ─────────────────────────────────────────── */}
                 <div className="border-t border-border" />
 
-                {/* Features */}
+                {/* ── Features ────────────────────────────────────────── */}
                 <section className="max-w-5xl mx-auto px-6 py-20">
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-10">
+                        Apa yang tersedia
+                    </p>
                     <motion.div
                         variants={stagger}
                         initial="hidden"
                         whileInView="show"
                         viewport={{ once: true, margin: '-80px' }}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                        className="grid grid-cols-1 md:grid-cols-3 gap-10"
                     >
                         {FEATURES.map((f, i) => (
                             <motion.div
                                 key={i}
                                 variants={fadeUp}
-                                transition={{ duration: 0.5, ease: 'easeOut' }}
+                                transition={{ duration: 0.4, ease: 'easeOut' }}
+                                className="space-y-3"
                             >
-                                <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow h-full">
-                                    <CardContent className="p-7 space-y-4">
-                                        <motion.div
-                                            whileHover={{ scale: 1.12, rotate: 4 }}
-                                            transition={{ type: 'spring', stiffness: 300, damping: 15 }}
-                                            className="h-11 w-11 rounded-lg bg-primary/10 flex items-center justify-center"
-                                        >
-                                            <f.icon className="h-5 w-5 text-primary" />
-                                        </motion.div>
-                                        <h3 className="text-base font-bold">{f.title}</h3>
-                                        <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-                                    </CardContent>
-                                </Card>
+                                <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${f.color}`}>
+                                    <f.icon className="h-5 w-5" />
+                                </div>
+                                <h3 className="text-sm font-bold text-foreground">{f.title}</h3>
+                                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
                             </motion.div>
                         ))}
                     </motion.div>
                 </section>
             </main>
 
-            {/* Footer */}
-            <motion.footer
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="border-t border-border py-6"
-            >
-                <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <p className="text-sm font-semibold text-muted-foreground">
-                        &copy; {new Date().getFullYear()} Komunitas PensMate
+            {/* ── Footer ──────────────────────────────────────────────── */}
+            <footer className="border-t border-border py-5">
+                <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+                    <p className="text-xs text-muted-foreground font-medium">
+                        © {new Date().getFullYear()} Komunitas PensMate
                     </p>
-                    <p className="text-xs text-muted-foreground/60">
-                        Laravel v{laravelVersion} &bull; PHP v{phpVersion}
+                    <p className="text-xs text-muted-foreground/50">
+                        Laravel v{laravelVersion} · PHP v{phpVersion}
                     </p>
                 </div>
-            </motion.footer>
+            </footer>
         </div>
     );
 }

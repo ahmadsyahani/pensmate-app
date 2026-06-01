@@ -15,18 +15,33 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // Mengambil semua event berurutan berdasarkan tanggal terdekat
-        $events = Event::with(['rundowns' => function($query) {
+        // Mengambil event berdasarkan tanggal terdekat
+        $today = \Carbon\Carbon::now()->startOfDay();
+
+        $upcomingEvents = Event::with(['rundowns' => function($query) {
             $query->orderBy('time_start', 'asc');
-        }])->orderBy('event_date', 'asc')->get();
+        }])->whereDate('event_date', '>=', $today)
+           ->orderBy('event_date', 'asc')
+           ->get();
+
+        $pastEvents = Event::with(['rundowns' => function($query) {
+            $query->orderBy('time_start', 'asc');
+        }])->whereDate('event_date', '<', $today)
+           ->orderBy('event_date', 'desc')
+           ->get();
 
         if ($user->role === 'admin') {
             // Statistik Khusus Admin (Dinamis dari Database)
             $totalMembers = User::where('role', 'member')->where('status', 'active')->count();
             $pendingMembers = User::where('role', 'member')->where('status', 'pending')->count();
 
+            // Tetap menggunakan events untuk kompatibilitas Admin/Dashboard sebelumnya
+            $allEvents = Event::with(['rundowns' => function($query) {
+                $query->orderBy('time_start', 'asc');
+            }])->orderBy('event_date', 'asc')->get();
+
             return Inertia::render('Admin/Dashboard', [
-                'events' => $events,
+                'events' => $allEvents,
                 'stats' => [
                     'total_members' => $totalMembers,
                     'pending_members' => $pendingMembers,
@@ -39,7 +54,8 @@ class DashboardController extends Controller
                 ->count();
 
             return Inertia::render('Member/Dashboard', [
-                'events' => $events,
+                'upcoming_events' => $upcomingEvents,
+                'past_events' => $pastEvents,
                 'stats' => [
                     'attendance_count' => $attendanceCount,
                 ]

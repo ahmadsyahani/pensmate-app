@@ -73,6 +73,7 @@ Route::middleware(['auth', 'active.user'])->group(function () {
     Route::get('/kehadiran', [AttendanceController::class, 'index'])->name('kehadiran.index');
     Route::post('/kehadiran', [AttendanceController::class, 'store'])->name('kehadiran.store');
     Route::get('/pensmates', [MemberDirectoryController::class, 'index'])->name('pensmates.index');
+    Route::get('/events/{id}', [EventController::class, 'memberShow'])->name('member.events.show');
 });
 
 require __DIR__.'/auth.php';

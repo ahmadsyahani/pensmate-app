@@ -52,7 +52,28 @@ class AdminController extends Controller
      */
     public function sessionPage()
     {
-        $events = \App\Models\Event::orderBy('event_date', 'desc')->get();
+        $events = \App\Models\Event::with(['attendances.user'])
+            ->orderBy('event_date', 'desc')
+            ->get()
+            ->map(function ($event) {
+                return [
+                    'id'          => $event->id,
+                    'title'       => $event->title,
+                    'event_date'  => $event->event_date,
+                    'start_time'  => $event->start_time,
+                    'end_time'    => $event->end_time,
+                    'location'    => $event->location,
+                    'status'      => $event->status,
+                    'attendances' => $event->attendances->map(fn($a) => [
+                        'id'          => $a->id,
+                        'attended_at' => $a->attended_at?->toIso8601String(),
+                        'user'        => [
+                            'name' => $a->user?->name,
+                            'nrp'  => $a->user?->nrp,
+                        ],
+                    ])->values(),
+                ];
+            });
 
         // Ambil semua sesi token beserta relasi event, diurutkan terbaru
         $sessions = AttendanceSession::with('event')
@@ -60,18 +81,18 @@ class AdminController extends Controller
             ->get()
             ->map(function ($session) {
                 return [
-                    'id'         => $session->id,
-                    'event_id'   => $session->event_id,
-                    'event_title'=> $session->event->title ?? '-',
-                    'token'      => $session->token,
-                    'expires_at' => $session->expires_at->toIso8601String(),
-                    'is_active'  => $session->is_active,
-                    'is_valid'   => $session->isValid(),
-                    'created_at' => $session->created_at->toIso8601String(),
+                    'id'          => $session->id,
+                    'event_id'    => $session->event_id,
+                    'event_title' => $session->event->title ?? '-',
+                    'token'       => $session->token,
+                    'expires_at'  => $session->expires_at->toIso8601String(),
+                    'is_active'   => $session->is_active,
+                    'is_valid'    => $session->isValid(),
+                    'created_at'  => $session->created_at->toIso8601String(),
                 ];
             });
 
-        return Inertia::render('Admin/Scan', [
+        return Inertia::render('Admin/Absen', [
             'events'   => $events,
             'sessions' => $sessions,
         ]);
@@ -109,13 +130,13 @@ class AdminController extends Controller
     }
 
     /**
-     * Nonaktifkan token sesi absensi
+     * Nonaktifkan & hapus token sesi absensi yang sudah dipakai
      */
     public function deactivateToken($id)
     {
         $session = AttendanceSession::findOrFail($id);
-        $session->update(['is_active' => false]);
+        $session->delete(); // Hapus langsung, sudah tidak dibutuhkan
 
-        return redirect()->back()->with('success', 'Sesi token berhasil dinonaktifkan.');
+        return redirect()->back()->with('success', 'Token berhasil dihapus.');
     }
 }

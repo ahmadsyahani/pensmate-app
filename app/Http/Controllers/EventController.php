@@ -79,6 +79,17 @@ class EventController extends Controller
         ]);
     }
 
+    public function memberShow($id)
+    {
+        $event = Event::with(['rundowns' => function($query) {
+            $query->orderBy('time_start', 'asc');
+        }])->findOrFail($id);
+
+        return Inertia::render('Member/Events/Show', [
+            'event' => $event
+        ]);
+    }
+
     /**
      * Menghapus event dari database
      */
